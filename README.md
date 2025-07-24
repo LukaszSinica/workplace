@@ -120,4 +120,8 @@ Symfony web app for managing workplace (vacation days calculator, remote work, t
 ## UI:
 
 ### Simple sketch
-<img width="889" height="594" alt="obraz" src="https://github.com/user-attachments/assets/191bfe8f-f614-402b-98c5-21fa05e51cb0" />
+<img width="889" height="594" alt="obraz" src="https://github.com/user-attachments/assets/191bfe8f-f614-402b-98c5-21fa05e51cb0" />  
+
+### Figma
+
+https://www.figma.com/design/KojiPduRF3mEiwaKwdt31A/Workplace-webapp?node-id=0-1&t=jAAwjgZNiQN5LpSE-1
