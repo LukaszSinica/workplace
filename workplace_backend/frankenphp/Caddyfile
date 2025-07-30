@@ -62,4 +62,26 @@
 	file_server {
 		hide *.php
 	}
+
+	
+}
+
+localhost:80 {
+    root /app/public
+    encode zstd br gzip
+
+    # This disables the default redirect for HTTP on port 80
+    # and serves the same app on HTTP (without forcing HTTPS)
+    @phpRoute {
+        not path /.well-known/mercure*
+        not file {path}
+    }
+    rewrite @phpRoute index.php
+
+    @frontController path index.php
+    php @frontController
+
+    file_server {
+        hide *.php
+    }
 }
