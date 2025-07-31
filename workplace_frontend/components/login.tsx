@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Input } from './ui/input'
 import { useForm } from 'react-hook-form'
 import { loginUser } from '@/lib/actions'
+import { useAuth } from '@/app/AuthContext'
 
 type LoginData = {
     email: string;
@@ -13,17 +14,16 @@ type LoginData = {
 
 export default function login() {
     const { register, formState: { errors }, handleSubmit } = useForm<LoginData>();
+    const { login } = useAuth();
 
     const onSubmit = (data: LoginData) => {
         console.log("Login data submitted:", data);
-        loginUser(data)
-            .then(response => {
-                if (response.message) {
-                    console.log("Login successful:", response);
-                    // Handle successful login (e.g., redirect, show success message)
+        login(data.email, data.password)
+            .then((success) => {
+                if (success) {
+                    console.log("Login successful");
                 } else {
-                    console.error("Login failed:", response.error);
-                    // Handle login failure (e.g., show error message)
+                    console.error("Login failed");
                 }
             })
     }
