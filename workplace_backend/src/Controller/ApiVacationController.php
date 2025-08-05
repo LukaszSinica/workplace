@@ -48,19 +48,28 @@ final class ApiVacationController extends AbstractController
         }
         $data = json_decode($request->getContent(), true);
 
-        if (!$data['date'] || !$data['reason']) {
+        if (!$data['date_from'] || !$data['date_to'] || !$data['reason']) {
             return $this->json([
                 'message' => 'Missing date or reason',
                 'status' => 'error',
             ], 400);
         }
 
-        $date = new DateTime($data['date']);
+        $dateFrom = new DateTime($data['date_from']);
+        $dateTo = new DateTime($data['date_to']);
+
+        if($dateFrom > $dateTo) {
+            return $this->json([
+                'message' => 'Invalid date range',
+                'status' => 'error',
+            ], 400);
+        }
         $reason = $data['reason'] ?? null;
 
         $vacationRequest = new VacationRequest();
         $vacationRequest->setUserId($user->getId()); 
-        $vacationRequest->setDate($date);
+        $vacationRequest->setDateFrom($dateFrom);
+        $vacationRequest->setDateTo($dateTo);
         $vacationRequest->setReason($reason);
         $entityManager->persist($vacationRequest);
         $entityManager->flush();
@@ -70,7 +79,7 @@ final class ApiVacationController extends AbstractController
             'vacation_request' => [
                 'id' => $vacationRequest->getId(),
                 'user_id' => $vacationRequest->getUserId(),
-                'date' => $vacationRequest->getDate()->format('Y-m-d'),
+                'days' => ($dateTo->diff($dateFrom)->days + 1),
                 'reason' => $vacationRequest->getReason(),
             ],
         ], 200);

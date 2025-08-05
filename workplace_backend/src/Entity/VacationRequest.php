@@ -18,7 +18,10 @@ class VacationRequest
     private ?int $user_id = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTime $date = null;
+    private ?\DateTime $dateFrom = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    private ?\DateTime $dateTo = null;
 
     #[ORM\Column(length: 255)]
     private ?string $reason = null;
@@ -47,14 +50,26 @@ class VacationRequest
         return $this;
     }
 
-    public function getDate(): ?\DateTime
+    public function getDateFrom(): ?\DateTime
     {
-        return $this->date;
+        return $this->dateFrom;
     }
 
-    public function setDate(\DateTime $date): static
+    public function setDateFrom(\DateTime $dateTo): static
     {
-        $this->date = $date;
+        $this->dateFrom = $dateTo;
+
+        return $this;
+    }
+
+    public function getDateTo(): ?\DateTime
+    {
+        return $this->dateTo;
+    }
+
+    public function setDateTo(\DateTime $dateTo): static
+    {
+        $this->dateTo = $dateTo;
 
         return $this;
     }
