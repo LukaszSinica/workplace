@@ -8,10 +8,10 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use App\Entity\VacationRequest;
 use Symfony\Bundle\SecurityBundle\Security;
-use DateTime;
 use Symfony\Component\HttpFoundation\Request;
+use App\Service\VacationRequestCreate;
+
 
 final class ApiVacationController extends AbstractController
 {
@@ -19,6 +19,7 @@ final class ApiVacationController extends AbstractController
     public function __construct(
         private RequestStack $requestStack,
         private Security $security,
+        private VacationRequestCreate $vacationRequestCreate,
     )
     {
     }
@@ -34,7 +35,7 @@ final class ApiVacationController extends AbstractController
 
 
     #[Route('/api/vacation_request/create', name: 'api_vacation_request_create', methods: ['POST'])]
-    public function vacation_requert(EntityManagerInterface $entityManager, Request $request): JsonResponse
+    public function vacation_requert(VacationRequestCreate $vacationRequestCreate, EntityManagerInterface $entityManager, Request $request): JsonResponse
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
         $userRepository = $entityManager->getRepository(User::class);
@@ -48,39 +49,29 @@ final class ApiVacationController extends AbstractController
         }
         $data = json_decode($request->getContent(), true);
 
-        if (!$data['date_from'] || !$data['date_to'] || !$data['reason']) {
+        $vacationRequest = $vacationRequestCreate->vacationRequestCreate(
+            $user->getId(),
+            $data['date_from'] ?? null,
+            $data['date_to'] ?? null,
+            $data['reason'] ?? null, 
+        );
+        
+        if($vacationRequest["code"] !== 200) {
             return $this->json([
-                'message' => 'Missing date or reason',
+                'message' => $vacationRequest["message"],
                 'status' => 'error',
-            ], 400);
+            ], $vacationRequest["code"]);
         }
-
-        $dateFrom = new DateTime($data['date_from']);
-        $dateTo = new DateTime($data['date_to']);
-
-        if($dateFrom > $dateTo) {
-            return $this->json([
-                'message' => 'Invalid date range',
-                'status' => 'error',
-            ], 400);
-        }
-        $reason = $data['reason'] ?? null;
-
-        $vacationRequest = new VacationRequest();
-        $vacationRequest->setUserId($user->getId()); 
-        $vacationRequest->setDateFrom($dateFrom);
-        $vacationRequest->setDateTo($dateTo);
-        $vacationRequest->setReason($reason);
-        $entityManager->persist($vacationRequest);
-        $entityManager->flush();
 
         return $this->json([
             'message' => 'vacation request added successfully',
             'vacation_request' => [
-                'id' => $vacationRequest->getId(),
-                'user_id' => $vacationRequest->getUserId(),
-                'days' => ($dateTo->diff($dateFrom)->days + 1),
-                'reason' => $vacationRequest->getReason(),
+                'id' => $vacationRequest["data"]['id'],
+                'date_from' => $vacationRequest["data"]['date_from'],
+                'date_to' => $vacationRequest["data"]['date_to'],
+                'reason' => $vacationRequest["data"]['reason'],
+                'user_id' => $vacationRequest["data"]['user_id'],
+                'days' => $vacationRequest["data"]['days'],
             ],
         ], 200);
     }
