@@ -19,7 +19,8 @@ class VacationRequestCreate
         int $userId, 
         string  $dateFrom, 
         string $dateTo, 
-        string $reason): Array
+        string $reason
+    ): Array
     {
         if (!$dateFrom || !$dateTo || !$reason) {
             return [
