@@ -1,4 +1,4 @@
-import Navbar from "@/components/navbar";
+import Breadcrumbs from "@/components/breadcrumbs";
 import { AppSidebar } from "@/components/sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
@@ -12,8 +12,9 @@ export default function MainLayout({
     <main className="flex flex-row h-screen w-full items-center">
       <AppSidebar />
       <section className="flex flex-col items-center w-full h-screen">
-        <nav className="w-full h-16 bg-white shadow-md flex items-center justify-between">
-          <SidebarTrigger />
+        <nav className="w-full h-16 bg-white shadow-md flex items-center gap-4">
+          <SidebarTrigger className="mx-2"/>
+          <Breadcrumbs/>
         </nav>
         {children}
       </section>
