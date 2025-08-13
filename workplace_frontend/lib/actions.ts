@@ -29,3 +29,19 @@ export async function vacationRequestCreate(vacationRequestData: { date_from: st
     });
   return res.json();
 }
+
+export async function vacationRequestList(): Promise<{ vacation_request: any[] }> {
+
+    const res = await fetch('http://localhost/api/vacation_request/list', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        mode: 'cors',
+        credentials: 'include',
+        
+    });
+    console.log(res);
+    return res.json();
+  
+}

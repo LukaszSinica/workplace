@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use App\Service\VacationRequestCreate;
+use App\Entity\VacationRequest;
 
 
 final class ApiVacationController extends AbstractController
@@ -75,4 +76,36 @@ final class ApiVacationController extends AbstractController
             ],
         ], 200);
     }
+
+    #[Route('/api/vacation_request/list', name: 'api_vacation_request_list', methods: ['GET'])]
+    public function vacationRequestListForUser(EntityManagerInterface $entityManager): JsonResponse
+    {
+        $userRepository = $entityManager->getRepository(User::class);
+        $userIdentifier = $this->security->getUser()->getUserIdentifier();
+        $user = $userRepository->findOneBy(['email' => $userIdentifier]);
+        if (!$user) {
+            return $this->json([
+                'message' => 'User not found',
+                'status' => 'error',
+            ], 404);
+        }
+
+        $vacationRequestRepository = $entityManager->getRepository(VacationRequest::class);
+        $vacationRequests = $vacationRequestRepository->findBy(['user_id' => $user->getId()]);
+        
+
+        return $this->json([
+            'message' => 'Vacation requests retrieved successfully',
+            'vacation_requests' => array_map(function ($request) {
+                return [
+                    'id' => $request->getId(),
+                    'date_from' => $request->getDateFrom()->format('Y-m-d'),
+                    'date_to' => $request->getDateTo()->format('Y-m-d'),
+                    'reason' => $request->getReason(),
+                ];
+            }, $vacationRequests),
+        ], 200);
+       
+    }
+
 }

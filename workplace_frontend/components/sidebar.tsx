@@ -21,9 +21,9 @@ const items = [
   {
     title: "Vacation",
     children: [
-      { title: "Request", url: "/vacation_request" },
-      { title: "List", url: "/vacation_request/list" },
-      { title: "View", url: "/vacation_request/view" },
+      { title: "Request", url: "/vacation/request" },
+      { title: "List", url: "/vacation/list" },
+      { title: "View", url: "/vacation/view" },
     ],
   },
   { title: "Calendar", url: "#" },
@@ -37,7 +37,7 @@ export function AppSidebar() {
   const toggleDropdown = (title: string) => {
     setOpenDropdown(openDropdown === title ? null : title)
   }
-
+  
   return (
     <Sidebar>
       <SidebarContent>

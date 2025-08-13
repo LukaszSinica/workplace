@@ -10,6 +10,12 @@ export default function Breadcrumbs() {
     if (segments.length === 0) {
       return null; 
     }
+
+    const hasPage = (href: string) => {
+      const allowedPaths = ["/", "/vacation/request", "/vacation/list", "/vacation/view"]
+      return allowedPaths.includes(href)
+    }
+
     return (
       <Breadcrumb>
         <BreadcrumbList>
@@ -28,7 +34,7 @@ export default function Breadcrumbs() {
               <React.Fragment key={href}>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  {isLast ? (
+                  {isLast || !hasPage(href) ? (
                     <BreadcrumbPage>{label}</BreadcrumbPage>
                   ) : (
                     <BreadcrumbLink asChild>
@@ -42,3 +48,4 @@ export default function Breadcrumbs() {
         </BreadcrumbList>
       </Breadcrumb>
     )
+  }
