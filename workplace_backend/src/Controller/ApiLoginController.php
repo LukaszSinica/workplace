@@ -11,6 +11,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\User;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Symfony\Component\HttpFoundation\Cookie;
 
 class ApiLoginController extends AbstractController
 {
@@ -48,10 +49,24 @@ class ApiLoginController extends AbstractController
 
         $token = $jwtManager->create($user);
 
-        return $this->json([
-            'user'    => $user->getUserIdentifier(),
-            'token'   => $token,
+        $cookie = Cookie::create(
+            name: 'AUTH_TOKEN',
+            value: $token,
+            expire: time() + 3600, // 1 hour expiration
+            path: '/',
+            domain: null,
+            secure: true,  // only send over HTTPS
+            httpOnly: true,
+            sameSite: 'Lax'
+        );
+    
+        $response = $this->json([
             'message' => 'Login successful',
+            'user'    => $user->getUserIdentifier(),
         ]);
+    
+        $response->headers->setCookie($cookie);
+    
+        return $response;
     }
 }

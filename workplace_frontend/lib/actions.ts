@@ -1,21 +1,11 @@
-export async function loginUser(LoginData: { email: string, password: string}) {
-    const res = await fetch('http://localhost/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        mode: 'cors',
-        credentials: 'include', // if using cookies/session
-        body: JSON.stringify({username: LoginData.email, password: LoginData.password}),
-      });
-    return res.json();
-}
+import { cookies } from "next/headers";
 
 export async function vacationRequestCreate(vacationRequestData: { date_from: string, date_to: string, reason: string}) {
+  const cookieStore = await cookies();
   const res = await fetch('http://localhost/api/vacation_request/create', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        Cookie: (await cookieStore).toString()
       },
       mode: 'cors',
       credentials: 'include',
@@ -30,18 +20,18 @@ export async function vacationRequestCreate(vacationRequestData: { date_from: st
   return res.json();
 }
 
-export async function vacationRequestList(): Promise<{ vacation_request: any[] }> {
-
+export async function vacationRequestList() {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("AUTH_TOKEN")?.value;
     const res = await fetch('http://localhost/api/vacation_request/list', {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
         mode: 'cors',
         credentials: 'include',
         
     });
-    console.log(res);
     return res.json();
   
 }

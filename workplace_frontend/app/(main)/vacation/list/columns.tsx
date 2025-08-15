@@ -13,6 +13,10 @@ export type VacationRequest = {
 
 export const columns: ColumnDef<VacationRequest>[] = [
   {
+    accessorKey: "id",
+    header: "ID",
+  },
+  {
     accessorKey: "date_from",
     header: "Date From",
   },

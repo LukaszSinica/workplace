@@ -24,7 +24,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const hasRole = (role: string) => authority.includes(role);
 
-    const login = async (username: string, password: string): Promise<boolean> => {
+    const login = async (email: string, password: string): Promise<boolean> => {
         try {
             const response = await fetch('http://localhost/api/login', {
                 method: 'POST',
@@ -33,18 +33,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 },
                 mode: 'cors',
                 credentials: 'include',
-                body: JSON.stringify({ username, password }),
+                body: JSON.stringify({ email, password }),
             });
 
             if (!response.ok) {
                 throw new Error('Login failed');
             }
-
+            
             const data = await response.json();
             setAuthenticated(true);
             setUsername(username);
             setToken(data.token);
             setAuthority(data.authority || []);
+
+            if (data.token) {
+                await fetch('/api/set-token', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ token: data.token })
+                });
+              }
             return true;
         } catch (error) {
             console.error("Login error:", error);

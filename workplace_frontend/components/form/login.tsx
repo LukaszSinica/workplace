@@ -16,7 +16,6 @@ export default function login() {
     const { login } = useAuth();
 
     const onSubmit = (data: LoginData) => {
-        console.log("Login data submitted:", data);
         login(data.email, data.password)
             .then((success) => {
                 if (success) {
