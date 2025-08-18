@@ -1,3 +1,4 @@
+"use server";
 import { cookies } from "next/headers";
 
 export async function vacationRequestCreate(vacationRequestData: { date_from: string, date_to: string, reason: string}) {

@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { vacationRequestCreate } from '@/lib/actions';
-import { useAuth } from '@/app/AuthContext';
 
 type VacationRequestData = {
     date_from: string;
