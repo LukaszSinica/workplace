@@ -36,3 +36,20 @@ export async function vacationRequestList() {
     return res.json();
   
 }
+
+
+export async function getUserData() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("AUTH_TOKEN")?.value;
+  const res = await fetch('http://localhost/api/user', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      mode: 'cors',
+      credentials: 'include',
+      
+  });
+  return res.json();
+
+}

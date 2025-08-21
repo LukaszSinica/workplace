@@ -3,9 +3,11 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Doctrine\DBAL\Types\Types;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -31,8 +33,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
-    
 
+    /**
+     * @var string The user's first name
+     */
+    #[ORM\Column(type: "string", nullable: true, options: ["default" => ""])]
+    private ?string $firstName = "";
+
+    /**
+     * @var string The user's second name
+     */
+    #[ORM\Column(type: "string", nullable: true, options: ["default" => ""])]
+    private ?string $secondName = "";
+
+    /**
+     * @var \DateTime The user's birthday
+     */
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTime $birthday = null;
+    
     public function getId(): ?int
     {
         return $this->id;
@@ -97,6 +116,41 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getFirstName(): ?string
+    {
+        return $this->firstName;
+    }
+
+    public function setFirstName(string $firstName): static
+    {
+        $this->firstName = $firstName;
+
+        return $this;
+    }
+
+    public function getSecondName(): ?string
+    {
+        return $this->secondName;
+    }
+
+    public function setSecondName(string $secondName): static
+    {
+        $this->secondName = $secondName;
+
+        return $this;
+    }
+
+    public function getBirthday(): ?DateTime
+    {
+        return $this->birthday;
+    }
+
+    public function setBirthday(DateTime $birthday): static
+    {
+        $this->birthday = $birthday;
+
+        return $this;
+    }
     /**
      * Ensure the session doesn't contain actual password hashes by CRC32C-hashing them, as supported since Symfony 7.3.
      */

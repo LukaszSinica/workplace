@@ -1,6 +1,10 @@
+import { getUserData } from '@/lib/actions';
 import React from 'react'
 
-export default function Profile() {
+export default async function Profile() {
+  const userData = await getUserData();
+  
+
   return (
     <main className="flex flex-col items-center w-full h-screen p-4">
         <h1 className='text-2xl font-bold'>Profile</h1>
@@ -9,8 +13,8 @@ export default function Profile() {
                 <img src="/profile_img.jpg" className='h-100 w-100' />
             </section>
             <section className='flex flex-col gap-12 w-2/3'>
-                <span>First name and Second name</span>
-                <span>Birthday</span>
+                <span>First name and Second name: {userData.firstName} {userData.secondName}</span>
+                <span>Birthday: {userData.birthday}</span>
                 <span>Sector</span>
                 <span>Position</span>
                 <span>workplace</span>

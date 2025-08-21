@@ -6,7 +6,6 @@ import { columns } from './columns';
 
 export default async function Page() {
   const data = await vacationRequestList();
-  console.log(data);
   const vacationRequest = data.vacation_requests;
 
   return (
