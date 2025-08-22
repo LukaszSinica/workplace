@@ -39,9 +39,10 @@ export async function vacationRequestList() {
 
 
 export async function getUserData() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("AUTH_TOKEN")?.value;
-  const res = await fetch('http://localhost/api/user', {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("AUTH_TOKEN")?.value;
+    const res = await fetch('http://localhost/api/user', {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -49,7 +50,10 @@ export async function getUserData() {
       mode: 'cors',
       credentials: 'include',
       
-  });
-  return res.json();
+    });
+    return res.json();
 
+  } catch (error) {
+    return {};
+  }
 }

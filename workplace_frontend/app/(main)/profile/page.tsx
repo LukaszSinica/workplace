@@ -1,3 +1,4 @@
+import DefaultPhoto from '@/components/ui/defaultPhoto';
 import { getUserData } from '@/lib/actions';
 import React from 'react'
 
@@ -10,8 +11,11 @@ export default async function Profile() {
         <h1 className='text-2xl font-bold'>Profile</h1>
         <div className="flex flex-row mt-8 w-full "> 
             <section className='w-1/3'>
-                <img src="/profile_img.jpg" className='h-100 w-100' />
-            </section>
+            {
+                userData.photo ? 
+                <img src={userData.photo} className='h-100 w-100' /> : 
+                <DefaultPhoto/>
+            }            </section>
             <section className='flex flex-col gap-12 w-2/3'>
                 <span>First name and Second name: {userData.firstName} {userData.secondName}</span>
                 <span>Birthday: {userData.birthday}</span>
