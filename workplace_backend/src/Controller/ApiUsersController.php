@@ -6,9 +6,9 @@ use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 final class ApiUsersController extends AbstractController
 {
@@ -29,19 +29,12 @@ final class ApiUsersController extends AbstractController
     }
 
     #[Route('/api/user', name: 'api_get_user_data', methods: ['GET'])]
-    public function getUserData(EntityManagerInterface $entityManager): JsonResponse
+    public function getUserData(#[CurrentUser] ?User $user): JsonResponse
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
-        $userRepository = $entityManager->getRepository(User::class);
-        $userIdentifier = $this->security->getUser()->getUserIdentifier();
-        $user = $userRepository->findOneBy(['email' => $userIdentifier]);
-
         
         if (!$user) {
-            return $this->json([
-                'message' => 'User not found',
-                'status' => 'error',
-            ], 404);
+            throw $this->createNotFoundException('User not found');
         }
 
         return $this->json([

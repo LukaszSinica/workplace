@@ -12,6 +12,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use App\Service\VacationRequestCreate;
 use App\Entity\VacationRequest;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 
 final class ApiVacationController extends AbstractController
@@ -36,18 +37,14 @@ final class ApiVacationController extends AbstractController
 
 
     #[Route('/api/vacation_request/create', name: 'api_vacation_request_create', methods: ['POST'])]
-    public function vacation_requert(VacationRequestCreate $vacationRequestCreate, EntityManagerInterface $entityManager, Request $request): JsonResponse
+    public function vacation_requert(#[CurrentUser] ?User $user, VacationRequestCreate $vacationRequestCreate, Request $request): JsonResponse
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
-        $userRepository = $entityManager->getRepository(User::class);
-        $userIdentifier = $this->security->getUser()->getUserIdentifier();
-        $user = $userRepository->findOneBy(['email' => $userIdentifier]);
+   
         if (!$user) {
-            return $this->json([
-                'message' => 'User not found',
-                'status' => 'error',
-            ], 404);
+            throw $this->createNotFoundException('User not found');
         }
+        
         $data = json_decode($request->getContent(), true);
 
         $vacationRequest = $vacationRequestCreate->vacationRequestCreate(
@@ -78,16 +75,12 @@ final class ApiVacationController extends AbstractController
     }
 
     #[Route('/api/vacation_request/list', name: 'api_vacation_request_list', methods: ['GET'])]
-    public function vacationRequestListForUser(EntityManagerInterface $entityManager): JsonResponse
+    public function vacationRequestListForUser(#[CurrentUser] ?User $user, EntityManagerInterface $entityManager): JsonResponse
     {
-        $userRepository = $entityManager->getRepository(User::class);
-        $userIdentifier = $this->security->getUser()->getUserIdentifier();
-        $user = $userRepository->findOneBy(['email' => $userIdentifier]);
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
+
         if (!$user) {
-            return $this->json([
-                'message' => 'User not found',
-                'status' => 'error',
-            ], 404);
+            throw $this->createNotFoundException('User not found');
         }
 
         $vacationRequestRepository = $entityManager->getRepository(VacationRequest::class);

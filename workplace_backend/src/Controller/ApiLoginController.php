@@ -52,10 +52,10 @@ class ApiLoginController extends AbstractController
         $cookie = Cookie::create(
             name: 'AUTH_TOKEN',
             value: $token,
-            expire: time() + 3600, // 1 hour expiration
+            expire: time() + 3600,
             path: '/',
             domain: null,
-            secure: true,  // only send over HTTPS
+            secure: true,
             httpOnly: true,
             sameSite: 'Lax'
         );
