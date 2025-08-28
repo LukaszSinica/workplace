@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Input } from '@/components/ui/input'
 import { useForm } from 'react-hook-form'
 import { useAuth } from '@/app/AuthContext'
+import { useRouter } from 'next/navigation'
 
 type LoginData = {
     email: string;
@@ -14,9 +15,10 @@ type LoginData = {
 export default function login() {
     const { register, formState: { errors }, handleSubmit } = useForm<LoginData>();
     const { login } = useAuth();
+    const router = useRouter();
 
-    const onSubmit = (data: LoginData) => {
-        login(data.email, data.password)
+    const onSubmit = async (data: LoginData) => {
+        await login(data.email, data.password)
             .then((success) => {
                 if (success) {
                     console.log("Login successful");
@@ -24,6 +26,7 @@ export default function login() {
                     console.error("Login failed");
                 }
             })
+        router.push("/");
     }
 
     return (

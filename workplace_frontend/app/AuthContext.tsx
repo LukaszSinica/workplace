@@ -1,4 +1,5 @@
 "use client"
+import { signOut } from "@/lib/actions";
 import { createContext, ReactNode, useContext, useState } from "react";
 
 
@@ -46,13 +47,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             setToken(data.token);
             setAuthority(data.authority || []);
 
-            if (data.token) {
-                await fetch('/api/set-token', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ token: data.token })
-                });
-              }
             return true;
         } catch (error) {
             console.error("Login error:", error);
@@ -60,7 +54,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
     };
 
-    const logout = () => {
+    const logout = async () => {
         setAuthenticated(false)
         setToken("")
         setUsername("")

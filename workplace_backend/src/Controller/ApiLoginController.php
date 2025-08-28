@@ -69,4 +69,23 @@ class ApiLoginController extends AbstractController
     
         return $response;
     }
+
+    #[Route('/api/logout', name: 'api_logout', methods: ['POST'])]
+    public function logout(): Response {
+
+        $response = $this->json([
+            'message' => 'Logged out successfully'
+        ]);
+
+        $response->headers->clearCookie(
+            name: 'AUTH_TOKEN',
+            path: '/',
+            domain: null,
+            secure: true,
+            httpOnly: true,
+            sameSite: 'Lax'
+        );
+
+        return $response;
+    }
 }

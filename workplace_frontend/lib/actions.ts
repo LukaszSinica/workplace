@@ -1,5 +1,6 @@
 "use server";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export async function vacationRequestCreate(vacationRequestData: { date_from: string, date_to: string, reason: string}) {
   const cookieStore = await cookies();
@@ -55,5 +56,25 @@ export async function getUserData() {
 
   } catch (error) {
     return {};
+  }
+}
+
+export async function signOut() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("AUTH_TOKEN")?.value;
+  try {
+    const res = await fetch('http://localhost/api/logout', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      mode: 'cors',
+      credentials: 'include',
+      
+    });
+    cookieStore.delete("AUTH_TOKEN");
+    console.log(res.json);
+  } catch (error) {
+    console.error("Logout error:", error);
   }
 }
