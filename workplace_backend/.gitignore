@@ -17,3 +17,5 @@
 ###< lexik/jwt-authentication-bundle ###
 .env.test
 .env
+.env.test.local
+
