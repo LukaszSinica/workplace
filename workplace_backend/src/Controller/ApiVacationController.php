@@ -7,7 +7,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use App\Service\VacationRequestCreate;
@@ -19,7 +18,6 @@ final class ApiVacationController extends AbstractController
 {
 
     public function __construct(
-        private RequestStack $requestStack,
         private Security $security,
         private VacationRequestCreate $vacationRequestCreate,
     )
