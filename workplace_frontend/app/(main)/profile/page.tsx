@@ -1,9 +1,9 @@
 import DefaultPhoto from '@/components/ui/defaultPhoto';
-import { getUserData } from '@/lib/actions';
+import { getProfileData } from '@/lib/actions';
 import React from 'react'
 
 export default async function Profile() {
-  const userData = await getUserData();
+  const userData = await getProfileData();
   
 
   return (

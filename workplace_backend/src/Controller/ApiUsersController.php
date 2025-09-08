@@ -2,13 +2,16 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\User;
 
 final class ApiUsersController extends AbstractController
 {
@@ -28,23 +31,35 @@ final class ApiUsersController extends AbstractController
         ]);
     }
 
-    #[Route('/api/user', name: 'api_get_user_data', methods: ['GET'])]
-    public function getUserData(#[CurrentUser] ?User $user): JsonResponse
+    #[Route('/api/user/password-change', name: 'api_user_password_change', methods: ['POST'])]
+    public function changePassword(#[CurrentUser] ?User $user, EntityManagerInterface $entityManager,  UserPasswordHasherInterface $passwordHasher, Request $request): JsonResponse
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
-        
+
         if (!$user) {
             throw $this->createNotFoundException('User not found');
         }
+        $data = json_decode($request->getContent(), true);
+        $password = $data['password'] ?? null;
+
+        if (!$password) {
+            return $this->json([
+                'message' => 'Password is required',
+                'status' => 'error',
+            ], 400);
+        }
+        $hashedPassword = $passwordHasher->hashPassword(
+            $user,
+            $password
+        );
+
+        $user->setPassword($hashedPassword);
+        $entityManager->persist($user);
+        $entityManager->flush();
 
         return $this->json([
-            'id' => $user->getId(),
-            'email' => $user->getEmail(),
-            'firstName' => $user->getFirstName(),
-            'secondName' => $user->getSecondName(),
-            'birthday' => $user->getBirthday() ? $user->getBirthday()->format('Y-m-d') : null,
-            'roles' => $user->getRoles(),
+            'message' => 'Password changed successfully',
+            'status' => 'success',
         ]);
     }
-
 }

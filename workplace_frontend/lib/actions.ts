@@ -39,11 +39,11 @@ export async function vacationRequestList() {
 }
 
 
-export async function getUserData() {
+export async function getProfileData() {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get("AUTH_TOKEN")?.value;
-    const res = await fetch('http://localhost/api/user', {
+    const res = await fetch('http://localhost/api/profile', {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
