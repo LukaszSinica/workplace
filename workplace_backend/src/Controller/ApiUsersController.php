@@ -10,8 +10,11 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\User;
+
 
 final class ApiUsersController extends AbstractController
 {
@@ -59,6 +62,50 @@ final class ApiUsersController extends AbstractController
 
         return $this->json([
             'message' => 'Password changed successfully',
+            'status' => 'success',
+        ]);
+    }
+
+    #[Route('/api/user/password-reset', name: 'api_user_password_reset', methods: ['POST'])]
+    public function resetPassword(
+        EntityManagerInterface $entityManager,  
+        UserPasswordHasherInterface $passwordHasher, 
+        Request $request, 
+        MailerInterface $mailer
+    ): JsonResponse {
+
+        $data = json_decode($request->getContent(), true);
+        $email = $data['email'] ?? null;
+        $password = bin2hex(random_bytes(10));
+
+        $user = $entityManager->getRepository(User::class)->findOneBy(['email' => $email ?? null]);
+        if (!$user) {
+            return $this->json([
+                'message' => 'User not found',
+                'status' => 'error',
+            ], 404);
+        }
+
+
+        $hashedPassword = $passwordHasher->hashPassword(
+            $user,
+            $password
+        );
+
+        $user->setPassword($hashedPassword);
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        $message = (new Email())
+        ->from('no-reply@example.com')
+        ->to($user->getEmail())
+        ->subject('Your new password')
+        ->text("Hello, your new password is: $password");
+
+        $mailer->send($message);
+
+        return $this->json([
+            'message' => 'Password reset successfully',
             'status' => 'success',
         ]);
     }
