@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Tests\Service;
+namespace App\Tests\Request;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class LoginRequestTest extends WebTestCase
+class AdminCreateUserTest extends WebTestCase
 {
 
     protected static function getKernelClass(): string
@@ -12,29 +12,7 @@ class LoginRequestTest extends WebTestCase
         return \App\Kernel::class;
     }
 
-    public function testLoginRequest(): void
-    {
-        $client = static::createClient();
-
-        $username = $_ENV['APP_TEST_USER'];
-        $password = $_ENV['APP_TEST_PASSWORD'];
-
-        $client->request(
-            'POST',
-            '/api/login',
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            json_encode([
-                'email' => $username,
-                'password' => $password
-            ])
-        );
-
-        $this->assertResponseHasCookie("AUTH_TOKEN");
-    }
-
-    public function testLogoutRequest(): void
+    public function testAdminCreateUser(): void
     {
         $client = static::createClient();
 
@@ -54,6 +32,7 @@ class LoginRequestTest extends WebTestCase
         );
 
         $this->assertResponseIsSuccessful();
+
         $cookie = $client->getCookieJar()->get('AUTH_TOKEN');
         $this->assertNotNull($cookie, 'AUTH_TOKEN cookie was not set on login response');
 
@@ -62,17 +41,27 @@ class LoginRequestTest extends WebTestCase
 
         $client->request(
             'POST',
-            '/api/logout',
+            '/api/admin/user/create',
             [],
             [],
             [
                 'HTTP_AUTHORIZATION' => sprintf('Bearer %s', $token),
-            ]
+                'CONTENT_TYPE' => 'application/json',
+            ],
+            json_encode([
+                "email" => "test@email.com", 
+                "firstName" => "Test", 
+                "secondName" => "User", 
+                "birthday" => "1990-01-01", 
+                "password" => "testpassword"
+            ])
         );
 
-        $cookie = $client->getResponse()->headers->getCookies()[0];
-        $this->assertSame('AUTH_TOKEN', $cookie->getName());
-        $this->assertNotNull($cookie->getExpiresTime()); 
+        $this->assertResponseIsSuccessful();
+        $this->assertJson($client->getResponse()->getContent());
 
+        $adminCreateUserRequest = json_decode($client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey('user_id', $adminCreateUserRequest);
+        $this->assertNotEmpty($adminCreateUserRequest['user_id']);      
     }
 }
